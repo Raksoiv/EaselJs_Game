@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Juego Personal 1</title>
+		<!--Library -->
+		<script type="text/javascript" src="scripts/easeljs-0.7.1.min.js"></script>
+		<script type="text/javascript" src="scripts/preloadjs-0.4.1.min.js"></script>
+		<script type="text/javascript" src="scripts/soundjs-0.5.2.min.js"></script>
+		<!-- External Sources -->
+		<script type="text/javascript" src="scripts/player.js"></script>
+		<script type="text/javascript" src="scripts/enemy.js"></script>
+		<!-- Game! -->
+		<script>
+			//Stage
+			var stage;
+			var stage_background;
+			var stage_height = 400, stage_width = 600;
+			//Player
+			var Player;
+			var Weapon_Sprite;
+			//Enemigos
+			var Enemy;
+			var enemigos = [];
+			//Registrar Input
+			document.onkeydown = handleKeyDown;
+			document.onkeyup = handleKeyUp;
+			var key_press = 0;
+			var type = 0;
+
+			//Funcion inicializadora del game play
+			function init(){
+				////////////////////
+				/////STAGE
+				////////////////////
+				//Creacion del Stage
+				stage = new createjs.Stage(document.getElementById("myCanvas"));
+				stage_background = new createjs.Bitmap("img/Stage.png");
+				stage_background.x = -1;
+				stage_background.y = -1;
+				////////////////////
+				/////IMAGES
+				////////////////////
+				//Creacion de los sprites
+				var ss = new createjs.SpriteSheet(createPlayerSpriteSheet());
+				Player = new createjs.Sprite(ss, "idle_front");
+				ss = new createjs.SpriteSheet(createWeaponSpriteSheet());
+				Weapon_Sprite = new createjs.Sprite(ss, "empty");
+				ss = new createjs.SpriteSheet(createEnemySpriteSheet());
+				Enemy = new createjs.Sprite(ss, "idle_front");
+				for(i = 0; i < 5; i++){
+					var temp = new createjs.Sprite(ss, "idle_front");
+					temp.x = (Math.random() * 300) | 0;
+					temp.y = (Math.random() * 300) | 0;
+					temp.animate = 0;
+					enemigos.push(temp);
+				}
+				//Ubicacion inicial de los Sprites
+				Player.x = 0;
+				Player.y = 0;
+				Weapon_Sprite.x = 0;
+				Weapon_Sprite.y = 0;
+				Enemy.x = (Math.random() * 300) | 0;
+				Enemy.y = (Math.random() * 300) | 0;
+				var i;
+				//Arma inicial del player
+				Player.weapon = 0;
+				//Instacias Especiales
+				Player.addEventListener("animationend", handleAnimationEndPlayer);
+				////////////////////
+				/////SOUNDS
+				////////////////////
+				createjs.Sound.initializeDefaultPlugins();
+				var manifest = [
+					{id:"sword_attack", src:"sound/swing.ogg"}
+				];
+				var preload = new createjs.LoadQueue(true);
+				preload.installPlugin(createjs.Sound);
+				preload.addEventListener("complete", onloadcomplete);
+				preload.loadManifest(manifest);
+			}
+
+			function onloadcomplete(){
+				//Añadiendo la animacion a la Stage
+				stage.addChild(stage_background);
+				stage.addChild(Player);
+				stage.addChild(Enemy);
+				stage.addChild(Weapon_Sprite);
+				for(i = 0; i < enemigos.length; i++){
+					stage.addChild(enemigos[i]);
+				}
+				//Definiedo FPS
+				createjs.Ticker.setFPS(60);
+				//Creando el Update method
+				createjs.Ticker.addEventListener("tick", tick);
+			}
+
+			//Funcion Updater
+			function tick(event){
+				if(type)
+					movementUpdate(key_press, Player, Weapon_Sprite);
+				animationUpdate(Player.weapon, key_press, type, Player, Weapon_Sprite);
+				enemyMove(Player, Enemy);
+				for(i = 0; i < enemigos.length; i++){
+					enemyMove(Player, enemigos[i]);
+				}
+				stage.update();
+				//console.log(Weapon_Sprite.currentAnimation);
+				if(Weapon_Sprite.currentAnimation == "blue_sword_attack_front" ||
+					Weapon_Sprite.currentAnimation == "blue_sword_attack_back" ||
+					Weapon_Sprite.currentAnimation == "blue_sword_attack_left" ||
+					Weapon_Sprite.currentAnimation == "blue_sword_attack_right"){
+					onHitSword(Weapon_Sprite, Enemy);
+					for(i = 0; i < enemigos.length; i++){
+						onHitSword(Weapon_Sprite, enemigos[i]);
+					}
+				}
+			}
+
+			//Funcion cuando se presiona una tecla
+			function handleKeyDown(e){
+				//console.log(e.keyCode);
+				if(!e){ var e = window.event; }
+				key_press = e.keyCode;
+				type = 1;
+			}
+
+			//Funcion cuenado se deja de precionar una tecla
+			function handleKeyUp(e){
+				//console.log(e.keyCode);
+				if(!e){ var e = window.event; }
+				type = 0;
+			}
+		</script>
+	</head>
+	<body onload="init()">
+		<canvas id="myCanvas" width="600" height="400" style="border: solid 1px black; border-radius: 5px;">
+			Content
+		</canvas>
+	</body>
+</html>

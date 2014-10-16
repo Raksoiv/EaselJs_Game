@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Juego Personal 1</title>
+		<script src="http://code.createjs.com/createjs-2013.12.12.min.js"></script>
+		<script src="http://code.createjs.com/easeljs-0.7.1.min.js"></script>
+
+		<script type="text/javascript" src="scripts/player.js"></script>
+		<script>
+			//Stage
+			var stage;
+			var stage_height = 400, stage_width = 600;
+			//Player
+			var Player;
+			var PlayerMovement = 0;
+			var PlayerAnimated = false;
+			var PlayerRun = false;
+			var PlayerIDLE = false;
+			//Player con Sword
+			var PlayerSword;
+			//Inputs
+			var KEYCODE_UP = 38;
+			var KEYCODE_DOWN = 40;
+			var KEYCODE_LEFT = 37;
+			var KEYCODE_RIGHT = 39;
+			//Registrar Input
+			document.onkeydown = handleKeyDown;
+			document.onkeyup = handleKeyUp;
+			//Guncion inicializadora
+			function init(){
+				//Creacion del Stage
+				stage = new createjs.Stage(document.getElementById("myCanvas"));
+				//Creacion del sprite
+				var ss = new createjs.SpriteSheet(createPlayerSpriteSheet());
+				//Creacion de la animacion
+				Player = new createjs.Sprite(ss, "idle_front");
+				//Ubicacion de la animacion
+				Player.x = 0;
+				Player.y = 0;
+				//Añadiendo la animacion a la Stage
+				stage.addChild(Player);
+				//Definiedo FPS
+				createjs.Ticker.setFPS(60);
+				//Creando el Update method
+				createjs.Ticker.addEventListener("tick", tick);
+			}
+
+			//Funcion Updater
+			function tick(event){
+				Player = PlayerMovementTick(PlayerMovement, PlayerAnimated, Player);
+				if(PlayerAnimated)
+					PlayerAnimated = false;
+				stage.update();
+			}
+
+			//Funcion cuando se presiona una tecla
+			function handleKeyDown(e){
+				//console.log(e.keyCode);
+				if(!e){ var e = window.event; }
+				switch(e.keyCode) {
+					case KEYCODE_LEFT:
+						if(!PlayerRun){
+							PlayerAnimated = true;
+							PlayerRun = true;
+							PlayerIDLE = false;
+						}
+						PlayerMovement = 8;
+						break;
+					case KEYCODE_RIGHT:
+						if(!PlayerRun){
+							PlayerAnimated = true;
+							PlayerRun = true;
+							PlayerIDLE = false;
+						}
+						PlayerMovement = 6;
+						break;
+					case KEYCODE_UP:
+						if(!PlayerRun){
+							PlayerAnimated = true;
+							PlayerRun = true;
+							PlayerIDLE = false;
+						}
+						PlayerMovement = 5;
+						break;
+					case KEYCODE_DOWN:
+						if(!PlayerRun){
+							PlayerAnimated = true;
+							PlayerRun = true;
+							PlayerIDLE = false;
+						}
+						PlayerMovement = 7;
+						break;
+				}
+			}
+
+			//Funcion cuenado se deja de precionar una tecla
+			function handleKeyUp(e){
+				//console.log(e.keyCode);
+				if(!e){ var e = window.event; }
+				switch(e.keyCode) {
+					case KEYCODE_LEFT:
+						if(!PlayerIDLE){
+							PlayerAnimated = true;
+							PlayerRun = false;
+							PlayerIDLE = true;
+						}
+						PlayerMovement = 4;
+						break;
+					case KEYCODE_RIGHT:
+						if(!PlayerIDLE){
+							PlayerAnimated = true;
+							PlayerRun = false;
+							PlayerIDLE = true;
+						}
+						PlayerMovement = 2;
+						break;
+					case KEYCODE_UP:
+						if(!PlayerIDLE){
+							PlayerAnimated = true;
+							PlayerRun = false;
+							PlayerIDLE = true;
+						}
+						PlayerMovement = 1;
+						break;
+					case KEYCODE_DOWN:
+						if(!PlayerIDLE){
+							PlayerAnimated = true;
+							PlayerRun = false;
+							PlayerIDLE = true;
+						}
+						PlayerMovement = 3;
+						break;
+				}
+			}
+		</script>
+	</head>
+	<body onload="init()">
+		<canvas id="myCanvas" width="600" height="400" style="border: solid 1px black; border-radius: 5px;">
+			Content
+		</canvas>
+	</body>
+</html>
